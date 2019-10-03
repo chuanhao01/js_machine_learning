@@ -1,7 +1,7 @@
 const canvas = {
     height: 600, 
     width: 600,
-}
+};
 
 const game = {
     init(height, width, rows, cols){
@@ -14,20 +14,21 @@ const game = {
         this.velocity = {
             x: 1,
             y: 1,
-        }
+        };
         this.snake = {
-            init(length, max_rows, max_cols){
+            init(length){
                 this.length = length;
                 this.body = [];
-                for(let x = this.length - 1; x>0; x--){
-                    y = 0;
-                    body_pos = {};
+                for(let x = this.length - 1; x > -1; x--){
+                    let y = 0;
+                    let body_pos = {};
                     body_pos.x = x;
                     body_pos.y = y;
+                    this.body.push(body_pos);
                 } 
             }
-        }
-        this.snake.init(3, this.rows, this.cols);
+        };
+        this.snake.init(3);
     },
     drawBoard(){
         for(let row = 0; row<this.rows; row++){
@@ -42,16 +43,29 @@ const game = {
     },
     drawSnake(){
         for(let i=0; i<this.snake.body.length; i++){
-            body_pos = this.snake.body[i];
-            x = body_pos.x;
-            y = body_pos.y;
-            draw_x = map(x, 0, this.cols, 0, this.width);
-            draw_y = map(y, 0, this.rows, 0, this.height);
+            let body_pos = this.snake.body[i];
+            let x = body_pos.x;
+            let y = body_pos.y;
+            let draw_x = map(x, 0, this.cols, 0, this.width);
+            let draw_y = map(y, 0, this.rows, 0, this.height);
             fill('red');
             rect(draw_x, draw_y, this.grid_width, this.grid_height);
         }
+    },
+    moveSnake(){
+        let x_vel = this.velocity.x;
+        let y_vel = this.velocity.y;
+        this.updateSnake(x_vel, y_vel);
+
+    },
+    updateSnake(x_vel, y_vel){
+        for(let i=0; i<this.snake.body.length; i++){
+            this.snake.body[i].x += x_vel;
+            this.snake.body[i].y += y_vel;
+        }
     }
-}
+
+};
 
 
 game.init(canvas.height, canvas.width, 20, 20);
@@ -64,6 +78,7 @@ function setup(){
 function draw(){
     game.drawBoard();
     game.drawSnake();
+    game.moveSnake();
 }
 
 // function mousePressed(){
