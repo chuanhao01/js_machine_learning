@@ -3,15 +3,15 @@ const Data = {
         this.dimension = dimension;
     },
     generateDatasetInt(num_of_points){
-        let features = [];
-        let targets = [];
+        features = []
+        targets = []
         for(let i=0; i<num_of_points; i++){
-            let X = []
+            X = []
             for(let j=0; j<this.dimension; j++){
                 X.push(Math.floor(Math.random() * 21));
             }
             X = nj.array(X).reshape([2, 1])
-            let y = Math.floor(Math.random() * 2);
+            y = Math.floor(Math.random() * 2);
             features.push(X);
             targets.push(y);
         }
@@ -20,7 +20,7 @@ const Data = {
             targets: targets
         };
     }
-};
+}
 
 const NerualNetwork = {
     init(input_nodes, hidden_nodes, learning_rate, features, targets){
@@ -37,17 +37,16 @@ const NerualNetwork = {
         this.weights_h_o_b = nj.random([1, 1]);
     },
     train(features, targets){
-        let num_of_data = features.length;
+        let num_of_data = features.length
         for(let data_index = 0; data_index<num_of_data; data_index++){
-            let X = features[data_index];
-            let y = targets[data_index];
-            let fwd_obj = this.forwardFeed(X);
-            this.backProp(X, y, fwd_obj);
+            X = features[data_index];
+            fwd_obj = this.forwardFeed(X)
+            this.backProp()
         }
     },
     activationFunction(x){
-        let sigmoid_output = nj.divide(nj.ones(x.shape), (nj.add(nj.exp(nj.multiply(x, -1)), 1)));
-        return sigmoid_output;
+        let sigmoid_output = nj.divide(nj.ones(x.shape), (nj.add(nj.exp(nj.multiply(x, -1)), 1)))
+        return sigmoid_output
     },
     forwardFeed(X){
         let hidden_input = nj.add(nj.dot(this.weights_i_h, X), this.weights_i_h_b);
@@ -62,42 +61,29 @@ const NerualNetwork = {
     },
     backProp(X, y, fwd_obj){
         let error = nj.subtract(fwd_obj.final_output, y);
-        error = error.get(0, 0);
 
         let delta_h_o = nj.multiply(fwd_obj.hidden_output.T, error);
         let delta_h_o_b = error;
 
-        let delta_i_h = [];
-        X = nj.array([1, 2]).reshape(2, 1);
-        let delta_i_h_b = nj.ones([this.hidden_nodes, 1]);
+        let delta_i_h
+        let delta_i_h_b = nj.ones([this.hidden_nodes, 1])
 
         for(let i=0; i<this.hidden_nodes; i++){
             if(i === 0){
                 delta_i_h = X.T;
             }
-            else{
-                delta_i_h = nj.concatenate(delta_i_h.T, X).T;
+            else {
+                delta_i_h = nj.stack([delta_i_h, X.T], -1);
             }
         }
-
-        // delta_i_h = nj.multiply(nj.multiply(nj.multiply(nj.multiply(this.weights_h_o.T, fwd_obj.hidden_output), (nj.subtract(nj.ones(fwd_obj.hidden_output.shape), fwd_obj.hidden_output))), error), delta_i_h);
-        // delta_i_h = nj.multiply(delta_i_h, nj.multiply(nj.multiply(nj.multiply(delta_h_o.T, fwd_obj.hidden_output), nj.subtract(nj.ones(fwd_obj.hidden_output.shape), fwd_obj.hidden_output)), error));
-        // delta_i_h_b = nj.multiply(delta_i_h_b, nj.multiply(nj.multiply(nj.multiply(delta_h_o.T, fwd_obj.hidden_output), nj.subtract(nj.ones(fwd_obj.hidden_output.shape), fwd_obj.hidden_output)), error));
-        console.log(delta_i_h.shape);
-        // console.log(delta_i_h_b.shape);
+        console.log(delta_i_h.shape)
     }
 
 
-};
+}
 
 let data = Data;
 data.init(2);
-let data_obj = data.generateDatasetInt(10);
-// NerualNetwork.init(2, 3, 0.01, data_obj.features, data_obj.targets);
-// NerualNetwork.train(data_obj.features, data_obj.targets);
-
-let a = nj.array([1, 2, 3]).reshape([3, 1]);
-let b = nj.array([[2, 2, 2], [3, 3, 3]]).reshape([3, 2]);
-
-// let c = nj.multiply(b , a);
-// console.log(c);
+data_obj = data.generateDatasetInt(10);
+NerualNetwork.init(2, 3, 0.01, data_obj.features, data_obj.targets);
+NerualNetwork.train(data_obj.features, data_obj.targets);
